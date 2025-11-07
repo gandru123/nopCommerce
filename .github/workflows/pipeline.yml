@@ -21,7 +21,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=gandru123_nopCommerce
-            -Dsonar.organization=gandru123
+            -Dsonar.organization=parvathigandru31
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
