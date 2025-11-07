@@ -5,11 +5,22 @@ on:
 
 jobs:
   dotnet_publish:
-    runs-on: self-hosted
+    runs-on: 'ubuntu-latest'
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarlcoud-github-action@v2
+        with:
+         mysonar: ${{ secrets.SONAR_TOKEN }}
+         mysonarurl: ${{ secrets.SONAR_HOST_URL}}
+
+      - name: install dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+         dotnet-version: "9.0.100"
 
       - name: Publish .NET project
         run: dotnet publish -c Release src/Presentation/Nop.Web/Nop.Web.csproj -o gandru
