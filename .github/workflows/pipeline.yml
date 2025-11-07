@@ -24,7 +24,7 @@ jobs:
             -Dsonar.organization=parvathigandru31
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
+          SONAR_HOST_URL: ${{secrets.SONAR_HOST_URL}}
 
       - name: Publish .NET project
         run: dotnet publish -c Release src/Presentation/Nop.Web/Nop.Web.csproj -o gandru
