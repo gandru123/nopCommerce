@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
@@ -19,7 +19,7 @@ jobs:
           dotnet-version: '9.0.100'
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
+        uses: SonarSource/sonarcloud-github-action@v3
         with:
           args: >
             -Dsonar.projectKey=gandru123_nopCommerce
@@ -43,6 +43,10 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build, Tag, and Push Docker image to ECR
+        env:
+          ECR_REGISTRY: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 753916464885.dkr.ecr.ap-south-1.amazonaws.com
+          ECR_REPOSITORY: gitactionjava
+          IMAGE_TAG: latest
         run: |
           docker build -t gitactionjava .
           docker tag gitactionjava:latest 753916464885.dkr.ecr.ap-south-1.amazonaws.com/gitactionjava:latest
