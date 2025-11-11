@@ -1,4 +1,4 @@
-name : dotnet
+name: dotnet
 
 on: 
   push:
@@ -42,13 +42,8 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build Docker image
-        env:
-          ECR_REGISTRY: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 753916464885.dkr.ecr.ap-south-1.amazonaws.com
-          ECR_REPOSITORY:: gitactionjava
-          IMAGE_TAG: latest
-
-      - run: |
+      - name: Build, Tag, and Push Docker image to ECR
+        run: |
           docker build -t gitactionjava .
           docker tag gitactionjava:latest 753916464885.dkr.ecr.ap-south-1.amazonaws.com/gitactionjava:latest
           docker push 753916464885.dkr.ecr.ap-south-1.amazonaws.com/gitactionjava:latest
