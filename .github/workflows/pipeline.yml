@@ -52,7 +52,7 @@ jobs:
           docker tag gitactionjava:latest 753916464885.dkr.ecr.ap-south-1.amazonaws.com/gitactionjava:latest
           docker push 753916464885.dkr.ecr.ap-south-1.amazonaws.com/gitactionjava:latest
 
-      - name: EKS with manifest file
+      - name: EKS integrate with manifest file
         uses: actions-hub/kubectl@master
         env:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
