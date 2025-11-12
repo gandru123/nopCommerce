@@ -52,12 +52,14 @@ jobs:
           docker tag gitactionjava:latest 753916464885.dkr.ecr.ap-south-1.amazonaws.com/gitactionjava:latest
           docker push 753916464885.dkr.ecr.ap-south-1.amazonaws.com/gitactionjava:latest
 
-      - name: Decode kubeconfig
+      - name: Configure kubectl for EKS
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > ~/.kube/config
+          aws eks update-kubeconfig --name my-cluster --region ap-south-1
 
-      - name: Deploy manifests to EKS
+  
+      - name: Deploy to EKS
         run: |
-          kubectl apply -f kubernetes/.
-          kubectl get pods -o wide
+          kubectl apply -f kubernetes/
+          kubectl rollout status deployment/nop-commerce-deployment
+          kubectl get svc
+
