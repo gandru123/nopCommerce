@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: nopcommerce
-          image: 753916464885.dkr.ecr.ap-south-1.amazonaws.com/gitactionjava:latest
+          image: ghcr.io/gandru123/nop:v2
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
