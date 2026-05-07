@@ -1,20 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   name: nop-commerce-deployment
+
 spec:
-  replicas: 2
+  replicas: 1
+
   selector:
     matchLabels:
       app: nopcommerce
+
   template:
     metadata:
       labels:
         app: nopcommerce
+
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
+
       containers:
-        - name: nopcommerce
-          image: ghcr.io/gandru123/nop:v2
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 5000
+      - name: nopcommerce
+        image: ghcr.io/gandru123/nop:v2
+        imagePullPolicy: Always
+
+        ports:
+        - containerPort: 80
