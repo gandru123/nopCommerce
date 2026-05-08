@@ -1,13 +1,88 @@
-name: dotnet
+# name: dotnet
 
-on: 
+# on: 
+#   push:
+#     branches:
+#       - develop
+
+# jobs:
+#   dotnet_publish:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v5
+
+#       - name: Set up .NET
+#         uses: actions/setup-dotnet@v4
+#         with:
+#           dotnet-version: '9.0.100'
+
+#       - name: SonarCloud Scan
+#         uses: SonarSource/sonarcloud-github-action@v3
+#         with:
+#           args: >
+#             -Dsonar.projectKey=gandru123_nopCommerce
+#             -Dsonar.organization=jenkins-java
+#         env:
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#           SONAR_HOST_URL: https://sonarcloud.io
+
+#       - name: Publish .NET project
+#         run: dotnet publish -c Release src/Presentation/Nop.Web/Nop.Web.csproj -o gandru
+
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ap-south-1
+
+#       - name: Login to Amazon ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v2
+
+#       - name: Build, Tag, and Push Docker image to ECR
+#         env:
+#           ECR_REGISTRY: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 753916464885.dkr.ecr.ap-south-1.amazonaws.com
+#           ECR_REPOSITORY: gitactionjava
+#           IMAGE_TAG: latest
+#         run: |
+#           docker build -t gitactionjava .
+#           docker tag gitactionjava:latest 753916464885.dkr.ecr.ap-south-1.amazonaws.com/gitactionjava:latest
+#           docker push 753916464885.dkr.ecr.ap-south-1.amazonaws.com/gitactionjava:latest
+
+#       - name: Configure kubectl for EKS
+#         run: |
+#           aws eks update-kubeconfig --name my-cluster --region ap-south-1
+
+  
+#       - name: Deploy to EKS
+#         run: |
+#           kubectl apply -f kubernetes/
+#           kubectl rollout status deployment/nop-commerce-deployment
+#           kubectl get svc
+
+
+
+
+
+
+
+
+name: dotnet-to-k3s
+
+on:
   push:
     branches:
       - develop
 
 jobs:
-  dotnet_publish:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout code
@@ -18,48 +93,37 @@ jobs:
         with:
           dotnet-version: '9.0.100'
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v3
-        with:
-          args: >
-            -Dsonar.projectKey=gandru123_nopCommerce
-            -Dsonar.organization=jenkins-java
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
+      # SonarQube disabled as requested
 
       - name: Publish .NET project
         run: dotnet publish -c Release src/Presentation/Nop.Web/Nop.Web.csproj -o gandru
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
+          registry: ghcr.io
+          username: gandru123
+          # Use the built-in GITHUB_TOKEN for registry auth
+          password: ${{ secrets.GIT_TOKEN_ID }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build, Tag, and Push Docker image to ECR
-        env:
-          ECR_REGISTRY: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 753916464885.dkr.ecr.ap-south-1.amazonaws.com
-          ECR_REPOSITORY: gitactionjava
-          IMAGE_TAG: latest
+      - name: Build and Push Docker image
         run: |
-          docker build -t gitactionjava .
-          docker tag gitactionjava:latest 753916464885.dkr.ecr.ap-south-1.amazonaws.com/gitactionjava:latest
-          docker push 753916464885.dkr.ecr.ap-south-1.amazonaws.com/gitactionjava:latest
+          docker build -t ghcr.io/gandru123/nop:v2 .
+          docker push ghcr.io/gandru123/nop:v2
 
-      - name: Configure kubectl for EKS
-        run: |
-          aws eks update-kubeconfig --name my-cluster --region ap-south-1
+      - name: Set Kubernetes Context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.K3S_KUBECONFIG }}
 
-  
-      - name: Deploy to EKS
+      - name: Deploy to k3s
         run: |
+          # Apply your manifests (Deployment, Service, etc.)
           kubectl apply -f kubernetes/
+          
+          # Force k3s to pull the new 'v2' image even if the tag hasn't changed
+          kubectl rollout restart deployment/nop-commerce-deployment
+          
+          # Check the status
           kubectl rollout status deployment/nop-commerce-deployment
-          kubectl get svc
-
