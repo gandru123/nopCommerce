@@ -1,26 +1,18 @@
-adminUser: admin
-adminPassword: admin123
-
-service:
-  type: ClusterIP
-  port: 80
-
-ingress:
-  enabled: true
-  ingressClassName: nginx
-
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-
-  hosts:
-    - grafana.3.108.7.7.nip.io
-
-  path: /
-  pathType: Prefix
-
-  tls: []
-
-persistence:
-  enabled: true
-  size: 5Gi
-  storageClassName: local-path
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: monitoring
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: grafana.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 80
