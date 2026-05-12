@@ -85,21 +85,32 @@ jobs:
       contents: read
       packages: write
 
+    env:
+      DOTNET_ROOT: /home/ubuntu/.dotnet
+      PATH: /home/ubuntu/.dotnet:/home/ubuntu/.dotnet/tools:${{ env.PATH }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
       - name: Verify .NET SDK
-        run: dotnet --version
+        run: |
+          export PATH=$PATH:/home/ubuntu/.dotnet
+          dotnet --version
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: |
+          export PATH=$PATH:/home/ubuntu/.dotnet
+          dotnet restore
 
       - name: Build project
-        run: dotnet build --configuration Release
+        run: |
+          export PATH=$PATH:/home/ubuntu/.dotnet
+          dotnet build --configuration Release
 
       - name: Publish .NET project
         run: |
+          export PATH=$PATH:/home/ubuntu/.dotnet
           dotnet publish src/Presentation/Nop.Web/Nop.Web.csproj \
           -c Release \
           -o publish
