@@ -101,6 +101,11 @@ jobs:
         run: |
           dotnet --version
 
+      - name: Clean old files
+        run: |
+          docker system prune -af || true
+          rm -rf ~/.nuget/packages/* || true
+
       - name: Restore dependencies
         run: |
           dotnet restore src/NopCommerce.sln
@@ -118,12 +123,17 @@ jobs:
           -o publish \
           --no-build
 
+      - name: Logout old GHCR session
+        run: |
+          docker logout ghcr.io || true
+
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "${{ secrets.GIT_TOKEN_ID }}" | docker login ghcr.io -u gandru123 --password-stdin
+
+      - name: Verify Docker Login
+        run: |
+          docker info
 
       - name: Build Docker image
         run: |
