@@ -7,19 +7,15 @@ service:
 
 ingress:
   enabled: true
-  ingressClassName: nginx
+  ingressClassName: traefik
 
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - grafana.3.7.62.55.nip.io
 
-  host: grafana.local
-  
   path: /
   pathType: Prefix
 
   tls: []
 
 persistence:
-  enabled: true
-  size: 5Gi
-  storageClassName: local-path
+  enabled: false
