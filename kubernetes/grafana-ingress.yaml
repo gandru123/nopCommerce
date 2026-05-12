@@ -12,9 +12,8 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 
-  hosts:
-    - grafana.3.7.62.55.nip.io 
-
+  host: grafana.local
+  
   path: /
   pathType: Prefix
 
