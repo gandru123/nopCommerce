@@ -89,10 +89,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '9.0.x'
+      - name: Verify .NET SDK
+        run: dotnet --version
 
       - name: Restore dependencies
         run: dotnet restore
@@ -101,7 +99,10 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: Publish .NET project
-        run: dotnet publish src/Presentation/Nop.Web/Nop.Web.csproj -c Release -o publish
+        run: |
+          dotnet publish src/Presentation/Nop.Web/Nop.Web.csproj \
+          -c Release \
+          -o publish
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v4
