@@ -10,7 +10,7 @@ ingress:
   ingressClassName: traefik
 
   hosts:
-    - grafana.3.7.62.55.nip.io
+    - grafana.13.200.4.238.nip.io  
 
   path: /
   pathType: Prefix
