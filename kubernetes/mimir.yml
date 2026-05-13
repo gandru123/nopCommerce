@@ -1,0 +1,220 @@
+# Lightweight Grafana Mimir Distributed values.yaml
+# Best for:
+# - Single node K3s
+# - 2 CPU / 4GB RAM VM
+# - Practice & learning
+# - Low resource usage
+
+mimir:
+  structuredConfig:
+    common:
+      storage:
+        backend: filesystem
+
+    blocks_storage:
+      backend: filesystem
+      filesystem:
+        dir: /data/blocks-storage
+
+    ruler_storage:
+      backend: filesystem
+      filesystem:
+        dir: /data/ruler-storage
+
+    alertmanager_storage:
+      backend: filesystem
+      filesystem:
+        dir: /data/alertmanager-storage
+
+    compactor:
+      data_dir: /data/compactor
+
+    limits:
+      ingestion_rate: 1000
+      ingestion_burst_size: 2000
+
+    server:
+      http_listen_port: 8080
+
+enterprise:
+  enabled: false
+
+# Disable MinIO for lightweight setup
+minio:
+  enabled: false
+
+# Enable nginx gateway
+nginx:
+  enabled: true
+
+gateway:
+  enabledNonEnterprise: true
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+    hosts:
+      - host: 13.200.4.238.nip.io
+
+        paths:
+          - path: /
+            pathType: Prefix
+
+# Disable caches to save memory
+admin-cache:
+  enabled: false
+
+chunks-cache:
+  enabled: false
+
+index-cache:
+  enabled: false
+
+metadata-cache:
+  enabled: false
+
+results-cache:
+  enabled: false
+
+overrides_exporter:
+  enabled: false
+
+rollout_operator:
+  enabled: false
+
+# SINGLE NODE SETTINGS
+global:
+  topologySpreadConstraints: []
+
+# Distributor
+distributor:
+  replicas: 1
+
+  resources:
+    requests:
+      cpu: 30m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# Ingester
+ingester:
+  replicas: 1
+
+  zoneAwareReplication:
+    enabled: false
+
+  persistentVolume:
+    enabled: true
+    size: 2Gi
+
+  topologySpreadConstraints: []
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+# Querier
+querier:
+  replicas: 1
+
+  resources:
+    requests:
+      cpu: 30m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# Query Frontend
+query_frontend:
+  replicas: 1
+
+  resources:
+    requests:
+      cpu: 20m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+
+# Query Scheduler
+query_scheduler:
+  replicas: 1
+
+  resources:
+    requests:
+      cpu: 20m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+
+# Store Gateway
+store_gateway:
+  replicas: 1
+
+  persistentVolume:
+    enabled: true
+    size: 2Gi
+
+  topologySpreadConstraints: []
+
+  resources:
+    requests:
+      cpu: 30m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# Compactor
+compactor:
+  replicas: 1
+
+  persistentVolume:
+    enabled: true
+    size: 2Gi
+
+  resources:
+    requests:
+      cpu: 30m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# Alertmanager
+alertmanager:
+  enabled: false
+
+  resources:
+    requests:
+      cpu: 20m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+
+# Ruler
+ruler:
+  enabled: false
+  resources:
+    requests:
+      cpu: 20m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
