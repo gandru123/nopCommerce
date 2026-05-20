@@ -10,12 +10,15 @@ ingress:
   ingressClassName: traefik
 
   hosts:
-    - grafana.13.201.170.117.nip.io  
+    - grafana.13.201.170.117.nip.io
 
   path: /
   pathType: Prefix
 
   tls: []
+
+plugins:
+  - grafana-oncall-app
 
 persistence:
   enabled: false
