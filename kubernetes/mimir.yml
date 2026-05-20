@@ -61,7 +61,7 @@ gateway:
       nginx.ingress.kubernetes.io/ssl-redirect: "false"
 
     hosts:
-      - host: 13.200.4.238.nip.io
+      - host: 13.201.170.117.nip.io
 
         paths:
           - path: /

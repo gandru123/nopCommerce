@@ -57,7 +57,7 @@ gateway:
       nginx.ingress.kubernetes.io/rewrite-target: /
 
     hosts:
-      - host: gateway.loki.13.200.4.238.nip.io
+      - host: gateway.loki.13.201.170.117.nip.io
         paths:
           - path: /
             pathType: Prefix
